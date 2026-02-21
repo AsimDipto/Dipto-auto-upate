@@ -1,42 +1,33 @@
 import requests
-import re
 import json
+import os
 
-def fetch_ip_channels():
-    # Targeted IP and pattern from your Star Jalsha link
-    target_ip = "103.229.254.25:7001"
-    search_query = f'"{target_ip}/play/"'
-    github_api_url = f"https://api.github.com/search/code?q={search_query}"
+def run_scraper():
+    # Target settings based on your Star Jalsha link
+    base_url = "http://103.229.254.25:7001/play/"
+    channels = []
     
-    headers = {"Accept": "application/vnd.github.v3+json"}
-    channel_list = []
-    unique_links = set()
+    # Scanning channel range (a0c0 to a0c50 as example)
+    for i in range(50):
+        channel_id = f"a0c{i}"
+        stream_link = f"{base_url}{channel_id}/index.m3u8"
+        
+        try:
+            # Checking if the link is active (timeout set for speed)
+            response = requests.head(stream_link, timeout=2)
+            if response.status_code == 200:
+                channels.append({
+                    "name": f"Channel_{channel_id}",
+                    "link": stream_link
+                })
+        except:
+            continue
 
-    try:
-        response = requests.get(github_api_url, headers=headers)
-        if response.status_code == 200:
-            items = response.json().get('items', [])
-            for item in items:
-                raw_url = item['html_url'].replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
-                file_data = requests.get(raw_url).text
-                
-                # Matches links like http://103.229.254.25:7001/play/a0c0/index.m3u8
-                pattern = r'http://103\.229\.254\.25:7001/play/[\w/]+'
-                found_links = re.findall(pattern, file_data)
-                
-                for link in found_links:
-                    if link not in unique_links:
-                        unique_links.add(link)
-                        channel_list.append({
-                            "name": f"Channel_{len(channel_list) + 1}",
-                            "link": link
-                        })
-            
-            with open('all_channels.json', 'w') as f:
-                json.dump(channel_list, f, indent=2)
-            print(f"Success: Found {len(channel_list)} channels.")
-    except Exception as e:
-        print(f"Error: {str(e)}")
+    # Creating the file even if empty to prevent GitHub Action error
+    with open('all_channels.json', 'w') as f:
+        json.dump(channels, f, indent=2)
+    
+    print(f"Scrape completed. Found {len(channels)} channels.")
 
 if __name__ == "__main__":
-    fetch_ip_channels()
+    run_scraper()
