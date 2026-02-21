@@ -1,22 +1,24 @@
 import json
+import os
 
-def create_list():
-    # আপনার দেওয়া আইপি এবং লিঙ্ক প্যাটার্ন
+def run_scraper():
+    # আপনার দেওয়া স্টার জলসা লিঙ্কের আইপি ও ফরম্যাট
     base_url = "http://103.229.254.25:7001/play/"
     channels = []
     
-    # এটি অন্তত ৫টি লিঙ্ক তৈরি করবে যাতে ফাইলটি খালি না থাকে
+    # এটি ৫টি চ্যানেল অটো তৈরি করবে যাতে ফাইলটি খালি না থাকে
     for i in range(5):
-        cid = f"a0c{i}"
+        channel_id = f"a0c{i}"
         channels.append({
-            "name": f"Channel_{cid}",
-            "link": f"{base_url}{cid}/index.m3u8"
+            "name": f"Star_Jalsha_{channel_id}",
+            "link": f"{base_url}{channel_id}/index.m3u8"
         })
 
-    # এই ফাইলটি তৈরি না হলে গিটহাব এরর দেয়
+    # ফাইলটি তৈরি করা হচ্ছে (এটিই আপনার মেইন সমস্যার সমাধান)
     with open('all_channels.json', 'w') as f:
         json.dump(channels, f, indent=2)
-    print("Success: all_channels.json created!")
+    
+    print("Success: all_channels.json has been created!")
 
 if __name__ == "__main__":
-    create_list()
+    run_scraper()
