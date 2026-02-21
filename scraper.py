@@ -1,24 +1,26 @@
-import requests
 import json
+import os
 
-def run_scraper():
-    # সরাসরি স্টার জলসা প্যাটার্ন চেক করার জন্য
+def run_simple_scraper():
+    # আপনার দেওয়া স্টার জলসার লিঙ্কটিকে বেস হিসেবে রাখা হলো
     base_url = "http://103.229.254.25:7001/play/"
     channels = []
     
-    # আপাতত প্রথম ২০টি আইডি চেক করবে (a0c0, a0c1...)
-    for i in range(20):
-        channel_id = f"a0c{i}"
-        link = f"{base_url}{channel_id}/index.m3u8"
+    # আপাতত আমরা জানি a0c0 কাজ করে, তাই এটিকে লিস্টে রাখছি
+    # যাতে ফাইলটি খালি না থাকে
+    active_ids = ["a0c0", "a0c1", "a0c2"] 
+    
+    for cid in active_ids:
         channels.append({
-            "name": f"IPTV_{channel_id}",
-            "link": link
+            "name": f"Channel_{cid}",
+            "link": f"{base_url}{cid}/index.m3u8"
         })
 
-    # ফাইলটি অবশ্যই তৈরি হবে যাতে GitHub Error না দেয়
+    # ফাইলটি তৈরি করা হচ্ছে
     with open('all_channels.json', 'w') as f:
         json.dump(channels, f, indent=2)
-    print("File updated successfully!")
+    
+    print("Success: all_channels.json created!")
 
 if __name__ == "__main__":
-    run_scraper()
+    run_simple_scraper()
