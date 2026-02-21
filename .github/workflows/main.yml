@@ -1,31 +1,31 @@
-name: IPTV Auto Scraper
+name: IPTV Auto Update
 on:
-  schedule:
-    - cron: '0 0 * * *'
   workflow_dispatch:
+  schedule:
+    - cron: "0 */12 * * *"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout Repo
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: "3.x"
 
-      - name: Install dependencies
+      - name: Install Requests
         run: pip install requests
 
-      - name: Run scraper
+      - name: Run Script
         run: python scraper.py
 
-      - name: Push results
+      - name: Save Files
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add all_channels.json
-          git commit -m "Updated channels from 103.229.254.25" || exit 0
+          git add -A
+          git commit -m "Auto Update" || exit 0
           git push
